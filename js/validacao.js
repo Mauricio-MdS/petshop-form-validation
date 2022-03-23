@@ -69,6 +69,9 @@ const mensagensDeErro = {
     estado: {
         valueMissing: 'Você precisa preencher o estado.'
     },
+    preco: {
+        valueMissing: 'Você precisa preencher o preço.'
+    }
 }
 
 const errosPossiveis = ['valueMissing', 'typeMismatch', 'patternMismatch', 'customError'];
