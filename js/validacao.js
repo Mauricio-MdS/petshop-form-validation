@@ -4,11 +4,13 @@ export function valida(input){
     const tipoDeInput = input.dataset.tipo;
     const campoDeErro = input.parentElement.querySelector('.input-mensagem-erro');
 
+    //Adiciona validadores para os inputs.
     if (validadores[tipoDeInput]){
         validadores[tipoDeInput](input);
 
     }
 
+    //Mostra ou esconde o span com a mensagem de erro no formulário
     if (input.validity.valid){
         input.parentElement.classList.remove('input-container--invalido');
     }else{
@@ -35,23 +37,37 @@ const cpfInvalido = [
 
 const mensagensDeErro = {
     nome: {
-        valueMissing: 'O campo nome precisa ser preenchido.',
+        valueMissing: 'Você precisa preencher o nome.',
     },
     email: {
         typeMismatch: 'Você precisa colocar um e-mail válido.',
-        valueMissing: 'O campo email precisa ser preenchido.',
+        valueMissing: 'Você precisa preencher o e-mail.',
     },
     senha: {
-        patternMismatch: 'A senha precisa ter pelo menos 6 caracteres e deve conter pelo menos uma letra um número.',
-        valueMissing: 'O campo senha precisa ser preenchido.',
+        patternMismatch: 'A senha precisa ter pelo menos 6 caracteres e deve conter pelo menos uma letra e um número.',
+        valueMissing: 'Você precisa escolher uma senha.',
     },
     dataNascimento: {
         customError: 'Só é permitido o cadastro para maiores de 18 anos.',
-        valueMissing: 'O campo data de nascimento precisa ser preenchido.',
+        valueMissing: 'Você precisa preencher a data de nascimento.',
     },
     cpf: {
         customError: 'CPF inválido',
-        valueMissing: 'O CPF precisa ser preenchido.',
+        valueMissing: 'Você precisa preencher o CPF.',
+    },
+    cep: {
+        customError: 'CEP inválido',
+        patternMismatch: 'CEP inválido',
+        valueMissing: 'Você precisa preencher o CEP.',
+    },
+    logradouro: {
+        valueMissing: 'Você precisa preencher o logradouro.'
+    },
+    cidade: {
+        valueMissing: 'Você precisa preencher a cidade.'
+    },
+    estado: {
+        valueMissing: 'Você precisa preencher o estado.'
     },
 }
 
@@ -63,6 +79,7 @@ Objeto com chave validadores e valor de respectivas funções validadoras
 const validadores = {
     dataNascimento: input => validaDataNascimento(input),
     cpf: input => validaCpf(input),
+    cep: input => validaCep(input),
 }
 
 function buscaMensagem(validade, tipo){
@@ -74,6 +91,46 @@ function buscaMensagem(validade, tipo){
     });
     return mensagem;
 
+}
+
+function preencheEndereco(endereco){
+    const campoLogradouro = document.querySelector('[data-tipo = logradouro]');
+    const campoCidade = document.querySelector('[data-tipo = cidade]');
+    const campoEstado = document.querySelector('[data-tipo = estado]');
+    campoLogradouro.value = endereco.logradouro;
+    campoCidade.value = endereco.localidade;
+    campoEstado.value = endereco.uf;
+    console.log(endereco);
+    console.log(campoLogradouro);
+    console.log(campoCidade);
+    console.log(campoEstado);
+}
+
+function validaCep(input){
+    input.setCustomValidity('');
+    if (input.validity.valid){
+        const cep = input.value.replace(/\D/g,'');
+        const url = `https://viacep.com.br/ws/${cep}/json`;
+        const options = {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json; charset=utf-8'
+            }
+        }
+        fetch(url, options).then(
+            response => response.json()
+        ).then(
+            data => {
+                if (data.erro){
+                    input.setCustomValidity('CEP inválido.');
+                    return;
+                }
+                preencheEndereco(data);
+            }
+        );
+    }
+    
 }
 
 function validaCpf(input){
