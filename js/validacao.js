@@ -20,6 +20,19 @@ export function valida(input){
 
 }
 
+const cpfInvalido = [
+    '00000000000',
+    '11111111111',
+    '22222222222',
+    '33333333333',
+    '44444444444',
+    '55555555555',
+    '66666666666',
+    '77777777777',
+    '88888888888',
+    '99999999999'
+]
+
 const mensagensDeErro = {
     nome: {
         valueMissing: 'O campo nome precisa ser preenchido.',
@@ -36,6 +49,10 @@ const mensagensDeErro = {
         customError: 'Só é permitido o cadastro para maiores de 18 anos.',
         valueMissing: 'O campo data de nascimento precisa ser preenchido.',
     },
+    cpf: {
+        customError: 'CPF inválido',
+        valueMissing: 'O CPF precisa ser preenchido.',
+    },
 }
 
 const errosPossiveis = ['valueMissing', 'typeMismatch', 'patternMismatch', 'customError'];
@@ -45,6 +62,7 @@ Objeto com chave validadores e valor de respectivas funções validadoras
 */
 const validadores = {
     dataNascimento: input => validaDataNascimento(input),
+    cpf: input => validaCpf(input),
 }
 
 function buscaMensagem(validade, tipo){
@@ -58,6 +76,61 @@ function buscaMensagem(validade, tipo){
 
 }
 
+function validaCpf(input){
+    let cpf = input.value.replace(/\D/g,'');
+    let mensagem = '';
+    if (cpf.length > 11){
+        mensagem = 'CPF inválido';
+    } else {
+        //adiciona zeros à esquerda
+        while(cpf.length < 11){
+            cpf = '0' + cpf;
+        }
+
+        //verifica números repetidos
+        cpfInvalido.forEach(invalido => {
+            if(cpf == invalido){
+                mensagem = 'CPF inválido';
+            }
+        });
+
+        //verificação do 1o dígito
+        let somaDigitoVerificador = 0;
+        for(let i = 0; i < 9; i++){
+            somaDigitoVerificador += cpf[i] * (10-i);
+        }
+
+        let controle = 11 - somaDigitoVerificador % 11;
+        if (controle > 9){
+            controle = 0;
+        }
+
+        if (cpf[9]!= controle){
+            mensagem = 'CPF inválido';
+        } else {
+
+
+            //verificação do 2o dígito
+            somaDigitoVerificador = 0;
+            for(let i = 0; i < 10; i++){
+                somaDigitoVerificador += cpf[i] * (11-i);
+            }
+
+            controle = 11 - somaDigitoVerificador % 11;
+            if (controle > 9){
+                controle = 0;
+            }
+
+            if (cpf[10]!= controle){
+                mensagem = 'CPF inválido';
+            }
+
+        }
+
+    }
+
+    input.setCustomValidity(mensagem);
+}
 
 
 /*
