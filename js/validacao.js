@@ -193,14 +193,13 @@ function validaCpf(input){
 }
 
 
-/*
-Apresenta problema no caso do aniversário de 18 anos ser hoje, por conta dos milissegundos
-*/
 function validaDataNascimento(input){
     const dataDeNascimento = new Date(input.value);
-    const dataStringMaioridade = `${dataDeNascimento.getUTCFullYear()+18}-${dataDeNascimento.getUTCMonth()+1}-${dataDeNascimento.getUTCDate()+1}`;
-    const dataDeMaioridade = new Date(dataStringMaioridade);
-    const dataDeHoje = new Date(Date.now());
+    const dataStringMaioridade = `${dataDeNascimento.getUTCFullYear()+18}-${dataDeNascimento.getUTCMonth()+1}-${dataDeNascimento.getUTCDate()}`;
+    let dataDeMaioridade = new Date(dataStringMaioridade);
+    dataDeMaioridade.setHours(0, 0, 0);
+    let dataDeHoje = new Date(Date.now());
+    dataDeHoje.setHours(0, 0, 0);
 
     //zera o campo para o caso de já ter apresentado resultado inválido
     let mensagem = '';
